@@ -1,24 +1,17 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
 
 * Database initialization
 
-* How to run the test suite
+  Make sure that the following CSV files are saved under the rales_engine/db folder
+  - merchants.csv
+  - customers.csv
+  - items.csv
+  - invoices.csv
+  - transactions.csv
+  - invoice_items.csv
 
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+  From the terminal run the following commands
+  1. Run bundle install
+  1. Run rails db:{drop,create,migrate}
+  1. Run bundle exec rake import
