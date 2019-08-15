@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :item do
-    name { "Shake" }
-    description { "Banana Milkshake" }
+    name { "Banana Milkshake" }
+    description { "Milkshake" }
     unit_price { 549 }
   end
 end
