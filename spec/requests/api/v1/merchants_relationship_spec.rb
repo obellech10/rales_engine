@@ -28,6 +28,8 @@ describe 'Merchants relationship endpoints' do
     get "/api/v1/merchants/#{merchant_1.id}/invoices"
 
     merchant = JSON.parse(response.body)
+
+    expect(response).to be_successful
     expect(merchant["data"].count).to eq(5)
   end
 end
