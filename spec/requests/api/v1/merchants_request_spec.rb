@@ -51,25 +51,27 @@ describe "Merchants API" do
   end
 
   it "can find merchant by created at parameter" do
-    created_merchant = Merchant.create(name: "banana stand", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+    created_merchant_1 = Merchant.create(name: "banana stand", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+    created_merchant_2 = Merchant.create(name: "Not banana stand", created_at: "2019-07-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
 
-    get "/api/v1/merchants/find?created_at=#{created_merchant.created_at}"
+    get "/api/v1/merchants/find?created_at=#{created_merchant_1.created_at}"
 
     merchant = JSON.parse(response.body)
 
     expect(response).to be_successful
-    expect(merchant["data"]["attributes"]["created_at"].to_date).to eq(created_merchant.created_at.to_date)
+    expect(merchant["data"]["attributes"]["name"]).to eq(created_merchant_1.name)
   end
 
   it "can find merchant by updated at parameter" do
-    created_merchant = Merchant.create(name: "banana stand", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+    created_merchant_1 = Merchant.create(name: "banana stand", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+    created_merchant_2 = Merchant.create(name: "banana stand", created_at: "2019-07-15 15:38:30 UTC", updated_at: "2019-07-15 15:38:30 UTC")
 
-    get "/api/v1/merchants/find?updated_at=#{created_merchant.updated_at}"
+    get "/api/v1/merchants/find?updated_at=#{created_merchant_1.updated_at}"
 
     merchant = JSON.parse(response.body)
 
     expect(response).to be_successful
-    expect(merchant["data"]["attributes"]["updated_at"].to_date).to eq(created_merchant.updated_at.to_date)
+    expect(merchant["data"]["attributes"]["name"]).to eq(created_merchant_1.name)
   end
 
   it "can find all merchants by id" do
