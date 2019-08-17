@@ -5,11 +5,16 @@ Rails.application.routes.draw do
         get '/find', to: 'search#show'
         get '/find_all', to: 'search#index'
         get '/most_revenue', to: 'most_revenue#index'
+        get '/revenue', to: 'revenue#show'
         get '/most_items', to: 'most_items#index'
         get '/:id/items', to: 'items#index'
         get '/:id/invoices', to: 'invoices#index'
         get '/:id/revenue', to: 'revenue#show'
-        # get '/:id/favorite_customer', to: 'favorite#show'
+        get '/:id/favorite_customer', to: 'favorite#show'
+      end
+
+      namespace :customers do
+        get '/:id/favorite_merchant', to: 'favorite#show'
       end
 
       resources :merchants, only: [:index, :show]
