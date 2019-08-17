@@ -22,22 +22,25 @@ class Merchant < ApplicationRecord
       .limit(quantity)
   end
 
-  # def favorite_customer
-  #   Invoice.joins(:transactions, :customer)
-  #     .select("customers.*, COUNT(invoices.customer_id) AS invoice_count")
-  #     .where("transactions.result = ?", 'success')
-  #     .where(invoices: {merchant_id: "merchants.id"})
-  #     .group("customers.id")
-  #     .order("invoice_count DESC")
-  #     .limit(1)
-  # end
-
   def favorite_customer
     Customer.joins(invoices: :transactions)
       .select("customers.*, COUNT(invoices.customer_id) AS invoice_count")
-      .where("transactions.result = ?", 'success')
       .where(invoices: {merchant_id: id})
+      .merge(Transaction.successful)
       .group("customers.id")
       .order("invoice_count DESC").first
   end
+
+  # def self.revenue(date)
+  #   Invoice.joins(:invoice_items, :transactions)
+  #     .merge(Transaction.successful)
+  #     .where({invoice_items: {created_at: (date.to_date.all_day)}})
+  #     .sum("invoice_items.quantity * invoice_items.unit_price")
+  # end
+  #
+  # def total_revenue
+  #   joins(invoices: [:invoice_items, :transactions])
+  #     .merge(Transaction.successful)
+  #     .sum("invoice_items.quantity * invoice_items.unit_price")
+  # end
 end
