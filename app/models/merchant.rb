@@ -21,4 +21,23 @@ class Merchant < ApplicationRecord
       .order('count DESC')
       .limit(quantity)
   end
+
+  # def favorite_customer
+  #   Invoice.joins(:transactions, :customer)
+  #     .select("customers.*, COUNT(invoices.customer_id) AS invoice_count")
+  #     .where("transactions.result = ?", 'success')
+  #     .where(invoices: {merchant_id: "merchants.id"})
+  #     .group("customers.id")
+  #     .order("invoice_count DESC")
+  #     .limit(1)
+  # end
+
+  def favorite_customer
+    Customer.joins(invoices: :transactions)
+      .select("customers.*, COUNT(invoices.customer_id) AS invoice_count")
+      .where("transactions.result = ?", 'success')
+      .where(invoices: {merchant_id: id})
+      .group("customers.id")
+      .order("invoice_count DESC").first
+  end
 end
