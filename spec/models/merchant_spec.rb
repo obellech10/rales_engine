@@ -28,8 +28,8 @@ RSpec.describe Merchant, type: :model do
       @invoice_1 = @merchant_1.invoices.create!(customer_id: @customer_1.id, status: "shipped")
       @invoice_2 = @merchant_2.invoices.create!(customer_id: @customer_2.id, status: "shipped")
       @invoice_3 = @merchant_3.invoices.create!(customer_id: @customer_1.id, status: "shipped")
-      @invoice_4 = @merchant_1.invoices.create!(customer_id: @customer_2.id, status: "shipped")
-      @invoice_5 = @merchant_4.invoices.create!(customer_id: @customer_1.id, status: "shipped")
+      @invoice_4 = @merchant_1.invoices.create!(customer_id: @customer_1.id, status: "shipped")
+      @invoice_5 = @merchant_4.invoices.create!(customer_id: @customer_2.id, status: "shipped")
 
       @invoice_items_1 = @invoice_1.invoice_items.create!(item_id: @item_1.id, quantity: 1, unit_price: @item_1.unit_price)
       @invoice_items_2 = @invoice_2.invoice_items.create!(item_id: @item_2.id, quantity: 2, unit_price: @item_2.unit_price)
@@ -45,7 +45,6 @@ RSpec.describe Merchant, type: :model do
     end
 
     it 'Returns the top 3 merchants ranked by total revenue' do
-
       top_merchants = Merchant.most_revenue(3)
 
       expect(top_merchants[0]).to eq(@merchant_1)
@@ -59,6 +58,12 @@ RSpec.describe Merchant, type: :model do
       expect(top_merchants[0]).to eq(@merchant_3)
       expect(top_merchants[1]).to eq(@merchant_1)
       expect(top_merchants[2]).to eq(@merchant_2)
+    end
+
+    it 'Returns the top customer for a merchant based on successful transactions' do
+      top_customer = @merchant_1.favorite_customer
+
+      expect(top_customer).to eq(@customer_1)
     end
   end
 end
