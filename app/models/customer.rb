@@ -9,7 +9,7 @@ class Customer < ApplicationRecord
     Merchant.joins(invoices: :transactions)
       .select("merchants.*, COUNT(invoices.merchant_id) AS invoice_count")
       .where(invoices: {customer_id: id})
-      .merge(Transaction.successful)
+      .merge(Transaction.unscoped.successful)
       .group("merchants.id")
       .order("invoice_count DESC").first
   end

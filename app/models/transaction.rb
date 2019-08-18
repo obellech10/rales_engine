@@ -5,4 +5,6 @@ class Transaction < ApplicationRecord
                         :result
 
   scope :successful, -> {where(result: 'success')}
+
+  default_scope{order(id: :asc)}
 end

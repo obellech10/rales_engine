@@ -1,0 +1,180 @@
+require 'rails_helper'
+
+describe "Transactions Record Endpoints" do
+  before :each do
+    @merchant_1 = Merchant.create!(name: "Apple", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+    @merchant_2 = Merchant.create!(name: "Keurig", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+    @merchant_3 = Merchant.create!(name: "Samsung", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+    @merchant_4 = Merchant.create!(name: "Whirlpool", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+
+    @customer_1 = Customer.create!(first_name: "Dan", last_name: "King")
+    @customer_2 = Customer.create!(first_name: "Chris", last_name: "Evert")
+
+    @item_1 = @merchant_1.items.create(name: "iPhone", description: "phone", unit_price: 90000)
+    @item_2 = @merchant_2.items.create(name: "Keurig 300", description: "coffee pot", unit_price: 6990)
+    @item_3 = @merchant_3.items.create(name: "Flat screen monitor", description: "monitor", unit_price: 11550)
+    @item_4 = @merchant_4.items.create(name: "Oven", description: "oven", unit_price: 65000)
+
+    @invoice_1 = @merchant_1.invoices.create!(customer_id: @customer_1.id, status: "shipped", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+    @invoice_2 = @merchant_2.invoices.create!(customer_id: @customer_2.id, status: "shipped", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+    @invoice_3 = @merchant_3.invoices.create!(customer_id: @customer_1.id, status: "shipped", created_at: "2000-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+    @invoice_4 = @merchant_1.invoices.create!(customer_id: @customer_2.id, status: "shipped", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2000-08-15 15:38:30 UTC")
+    @invoice_5 = @merchant_4.invoices.create!(customer_id: @customer_1.id, status: "shipped", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+
+    @invoice_items_1 = @invoice_1.invoice_items.create!(item_id: @item_1.id, quantity: 1, unit_price: @item_1.unit_price, created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+    @invoice_items_2 = @invoice_2.invoice_items.create!(item_id: @item_2.id, quantity: 2, unit_price: @item_2.unit_price, created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+    @invoice_items_3 = @invoice_3.invoice_items.create!(item_id: @item_3.id, quantity: 5, unit_price: @item_3.unit_price, created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+    @invoice_items_4 = @invoice_4.invoice_items.create!(item_id: @item_1.id, quantity: 2, unit_price: @item_1.unit_price, created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+    @invoice_items_5 = @invoice_5.invoice_items.create!(item_id: @item_4.id, quantity: 1, unit_price: @item_4.unit_price, created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+
+    @transaction_1 = @invoice_1.transactions.create!(credit_card_number: 123456781234, credit_card_expiration_date: nil, result: "success", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+    @transaction_2 = @invoice_2.transactions.create!(credit_card_number: 123456781234, credit_card_expiration_date: nil, result: "success", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+    @transaction_3 = @invoice_3.transactions.create!(credit_card_number: 123456781234, credit_card_expiration_date: nil, result: "success", created_at: "2000-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+    @transaction_4 = @invoice_4.transactions.create!(credit_card_number: 123456781234, credit_card_expiration_date: nil, result: "success", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2000-08-15 15:38:30 UTC")
+    @transaction_5 = @invoice_5.transactions.create!(credit_card_number: 123456781234, credit_card_expiration_date: nil, result: "success", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
+  end
+
+  it "Sends a list of transactions" do
+    get '/api/v1/transactions'
+
+    expect(response).to be_successful
+
+    transactions = JSON.parse(response.body)
+
+    expect(transactions["data"].count).to eq(5)
+  end
+
+  it "Can return a transaction by it's id" do
+    get "/api/v1/transactions/#{@transaction_1.id}"
+
+    expect(response).to be_successful
+
+    transaction = JSON.parse(response.body)
+
+    expect(transaction["data"]["attributes"]["id"]).to eq(@transaction_1.id)
+  end
+
+  describe "Single Finder Endpoints" do
+    it "Can find a transaction by id" do
+      get "/api/v1/transactions/find?id=#{@transaction_2.id}"
+
+      expect(response).to be_successful
+
+      transaction = JSON.parse(response.body)
+
+      expect(transaction["data"]["attributes"]["id"]).to eq(@transaction_2.id)
+    end
+
+    it "Can find a transaction by invoice id" do
+      get "/api/v1/transactions/find?invoice_id=#{@transaction_3.invoice_id}"
+
+      expect(response).to be_successful
+
+      transaction = JSON.parse(response.body)
+
+      expect(transaction["data"]["attributes"]["id"]).to eq(@transaction_3.id)
+    end
+
+    it "Can find a transaction by credit card number" do
+      get "/api/v1/transactions/find?credit_card_number=#{@transaction_1.credit_card_number}"
+
+      expect(response).to be_successful
+
+      transaction = JSON.parse(response.body)
+
+      expect(transaction["data"]["attributes"]["id"]).to eq(@transaction_1.id)
+    end
+
+    it "Can find a transaction by result" do
+      get "/api/v1/transactions/find?result=#{@transaction_1.result}"
+
+      expect(response).to be_successful
+
+      transaction = JSON.parse(response.body)
+
+      expect(transaction["data"]["attributes"]["id"]).to eq(@transaction_1.id)
+    end
+
+    it "Can find a transaction by created_at" do
+      get "/api/v1/transactions/find?created_at=#{@transaction_3.created_at}"
+
+      expect(response).to be_successful
+
+      transaction = JSON.parse(response.body)
+
+      expect(transaction["data"]["attributes"]["id"]).to eq(@transaction_3.id)
+    end
+
+    it "Can find a transaction by updated_at" do
+      get "/api/v1/transactions/find?updated_at=#{@transaction_4.updated_at}"
+
+      expect(response).to be_successful
+
+      transaction = JSON.parse(response.body)
+
+      expect(transaction["data"]["attributes"]["id"]).to eq(@transaction_4.id)
+    end
+  end
+
+  describe "Multi-Finder Endpoints" do
+    it "Can find a transaction by id" do
+      get "/api/v1/transactions/find_all?id=#{@transaction_2.id}"
+
+      expect(response).to be_successful
+
+      transactions = JSON.parse(response.body)
+
+      expect(transactions["data"].first["attributes"]["id"]).to eq(@transaction_2.id)
+    end
+
+    it "Can find a transaction by invoice id" do
+      get "/api/v1/transactions/find_all?invoice_id=#{@transaction_3.invoice_id}"
+
+      expect(response).to be_successful
+
+      transactions = JSON.parse(response.body)
+
+      expect(transactions["data"].first["attributes"]["id"]).to eq(@transaction_3.id)
+    end
+
+    it "Can find a transaction by credit card number" do
+      get "/api/v1/transactions/find_all?credit_card_number=#{@transaction_1.credit_card_number}"
+
+      expect(response).to be_successful
+
+      transactions = JSON.parse(response.body)
+
+      expect(transactions["data"].first["attributes"]["id"]).to eq(@transaction_1.id)
+    end
+
+    it "Can find a transaction by result" do
+      get "/api/v1/transactions/find_all?result=#{@transaction_1.result}"
+
+      expect(response).to be_successful
+
+      transactions = JSON.parse(response.body)
+
+      expect(transactions["data"].first["attributes"]["id"]).to eq(@transaction_1.id)
+    end
+
+    it "Can find a transaction by created_at" do
+      get "/api/v1/transactions/find_all?created_at=#{@transaction_3.created_at}"
+
+      expect(response).to be_successful
+
+      transactions = JSON.parse(response.body)
+
+      expect(transactions["data"].first["attributes"]["id"]).to eq(@transaction_3.id)
+    end
+
+    it "Can find a transaction by updated_at" do
+      get "/api/v1/transactions/find_all?updated_at=#{@transaction_4.updated_at}"
+
+      expect(response).to be_successful
+
+      transactions = JSON.parse(response.body)
+
+      expect(transactions["data"].first["attributes"]["id"]).to eq(@transaction_4.id)
+    end
+  end
+end
