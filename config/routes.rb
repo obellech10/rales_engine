@@ -14,16 +14,19 @@ Rails.application.routes.draw do
       end
 
       namespace :customers do
-        get '/:id/favorite_merchant', to: 'favorite#show'
         get '/find', to: 'search#show'
         get '/find_all', to: 'search#index'
         get '/:id/invoices', to: 'invoices#index'
         get '/:id/transactions', to: 'transactions#index'
+        get '/:id/favorite_merchant', to: 'favorite#show'
       end
 
       namespace :invoice_items do
         get '/find', to: 'search#show'
-      end 
+        get '/find_all', to: 'search#index'
+        get '/:id/invoice', to: 'invoice#show'
+        get '/:id/item', to: 'item#show'
+      end
 
       resources :merchants, only: [:index, :show]
       resources :customers, only: [:index, :show]
