@@ -4,4 +4,6 @@ class InvoiceItem < ApplicationRecord
 
   validates_presence_of :quantity,
                         :unit_price
+
+  default_scope{order(id: :asc)}
 end
