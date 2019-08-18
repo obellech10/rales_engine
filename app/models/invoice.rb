@@ -7,4 +7,6 @@ class Invoice < ApplicationRecord
   has_many :items, through: :invoice_items
 
   validates_presence_of :status
+
+  default_scope{order(id: :asc)}
 end
