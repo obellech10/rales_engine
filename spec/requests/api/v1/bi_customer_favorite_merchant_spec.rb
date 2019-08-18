@@ -1,17 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe Customer, type: :model do
-  describe 'Relationships' do
-    it {should have_many :invoices}
-  end
-
-  describe 'Validations' do
-    it {should validate_presence_of :first_name}
-    it {should validate_presence_of :last_name}
-  end
-
-  describe 'Class methods' do
-    it 'Returns the top merchant for a customer based on successful transactions' do
+RSpec.describe 'Customers' do
+  describe 'Customers Business Intelligence' do
+    it 'Can return the customers favorite merchant by total successful transactions' do
       merchant_1 = Merchant.create!(name: "Apple", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
       merchant_2 = Merchant.create!(name: "Keurig", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
       merchant_3 = Merchant.create!(name: "Samsung", created_at: "2019-08-15 15:38:30 UTC", updated_at: "2019-08-15 15:38:30 UTC")
@@ -42,9 +33,12 @@ RSpec.describe Customer, type: :model do
       transaction_4 = invoice_4.transactions.create!(credit_card_number: 123456781234, credit_card_expiration_date: nil, result: "success")
       transaction_5 = invoice_5.transactions.create!(credit_card_number: 123456781234, credit_card_expiration_date: nil, result: "success")
 
-      top_merchant = customer_1.favorite_merchant
+      get "/api/v1/customers/#{customer_1.id}/favorite_merchant"
 
-      expect(top_merchant).to eq(merchant_1)
+      top_customer = JSON.parse(response.body)
+
+      expect(response).to be_successful
+      expect(top_customer["data"]["attributes"]["name"]).to eq(merchant_1.name)
     end
   end
 end
